@@ -31,7 +31,7 @@ const mensagemDeTexto = (campo: string) => (entrada: { input: unknown }) =>
 const nomeSchema = z
   .string({ error: mensagemDeTexto('nome') })
   .transform(normalizarNome)
-  .refine((nome) => nome.length <= TAMANHO_MAXIMO_NOME, {
+  .refine((nome) => Array.from(nome).length <= TAMANHO_MAXIMO_NOME, {
     error: `O nome deve ter no máximo ${TAMANHO_MAXIMO_NOME} caracteres`,
     abort: true,
   })

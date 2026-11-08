@@ -3,7 +3,12 @@ import request from 'supertest';
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 
 import { criarApp } from '../../src/app.js';
-import { idsInvalidos, nomesInvalidos, telefonesInvalidos } from '../apoio/casos-de-validacao.js';
+import {
+  idsInvalidos,
+  nomeNoLimiteForaDoPlanoBasico,
+  nomesInvalidos,
+  telefonesInvalidos,
+} from '../apoio/casos-de-validacao.js';
 import { criarRepositorioDeTeste, type RepositorioDeTeste } from './apoio/repositorio-de-teste.js';
 
 const NOME = 'Ana Souza';
@@ -47,6 +52,15 @@ describe('API de contatos', () => {
         .send({ nome: '  José   Araújo ', telefone: '+55 (91) 98888-7777' });
 
       expect(resposta.body).toEqual({ id: 1, nome: 'José Araújo', telefone: TELEFONE });
+    });
+
+    it('grava no limite um nome com letras fora do plano básico', async () => {
+      const resposta = await request(app)
+        .post('/contatos')
+        .send({ nome: nomeNoLimiteForaDoPlanoBasico, telefone: TELEFONE });
+
+      expect(resposta.status).toBe(201);
+      expect(resposta.body.nome).toBe(nomeNoLimiteForaDoPlanoBasico);
     });
 
     it('aceita repetir o mesmo telefone', async () => {
@@ -168,6 +182,17 @@ describe('API de contatos', () => {
 
       expect(resposta.status).toBe(200);
       expect(resposta.body).toEqual({ id, nome: NOME, telefone: '9133334444' });
+    });
+
+    it('atualiza no limite um nome com letras fora do plano básico', async () => {
+      const { id } = await criarContato();
+
+      const resposta = await request(app)
+        .patch(`/contatos/${id}`)
+        .send({ nome: nomeNoLimiteForaDoPlanoBasico });
+
+      expect(resposta.status).toBe(200);
+      expect(resposta.body.nome).toBe(nomeNoLimiteForaDoPlanoBasico);
     });
 
     it('atualiza só o nome e preserva o telefone', async () => {

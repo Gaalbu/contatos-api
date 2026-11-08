@@ -1,3 +1,5 @@
+export const nomeNoLimiteForaDoPlanoBasico = `${'𠮷'.repeat(59)} ${'𠮷'.repeat(60)}`;
+
 export const nomesValidos = [
   ['Ana Souza', 'Ana Souza'],
   ['  Ana   Souza  ', 'Ana Souza'],
@@ -7,6 +9,7 @@ export const nomesValidos = [
   ["Sant'Ana Souza", "Sant'Ana Souza"],
   ['José Araújo', 'José Araújo'],
   [`${'a'.repeat(59)} ${'b'.repeat(60)}`, `${'a'.repeat(59)} ${'b'.repeat(60)}`],
+  [nomeNoLimiteForaDoPlanoBasico, nomeNoLimiteForaDoPlanoBasico],
 ] as const;
 
 export const nomesInvalidos: readonly unknown[] = [
@@ -23,6 +26,7 @@ export const nomesInvalidos: readonly unknown[] = [
   123,
   [],
   `${'a'.repeat(60)} ${'b'.repeat(60)}`,
+  `${'𠮷'.repeat(60)} ${'𠮷'.repeat(60)}`,
 ];
 
 export const dddsExistentes: readonly number[] = [
