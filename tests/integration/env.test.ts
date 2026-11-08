@@ -31,10 +31,20 @@ describe('carregarConfig', () => {
     });
   });
 
-  it.each(Object.keys(ambiente))('identifica a variável vazia %s sem expor valores', (variavel) => {
-    vi.stubEnv(variavel, '');
+  it.each(
+    Object.keys(ambiente).flatMap((variavel) => [
+      ...(variavel === 'DB_PASSWORD' ? [] : [{ variavel, valor: '' }]),
+      { variavel, valor: undefined },
+    ]),
+  )('identifica $variavel com valor $valor sem expor credenciais', ({ variavel, valor }) => {
+    vi.stubEnv(variavel, valor);
     expect(carregarConfig).toThrow(variavel);
     expect(carregarConfig).not.toThrow(ambiente.DB_PASSWORD);
+  });
+
+  it('aceita senha explicitamente vazia para instalações locais sem autenticação', () => {
+    vi.stubEnv('DB_PASSWORD', '');
+    expect(carregarConfig().banco.senha).toBe('');
   });
 
   it.each(['0', '-1', '65536', '1.5', '1e3', '0x10', 'abc', ' 3000 '])(

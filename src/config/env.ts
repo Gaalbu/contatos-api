@@ -1,3 +1,8 @@
+import { config } from 'dotenv';
+import { z } from 'zod';
+
+config({ quiet: true });
+
 export type ConfigBanco = {
   host: string;
   porta: number;
@@ -18,7 +23,7 @@ const esquema = z.object({
   DB_HOST: texto,
   DB_PORT: porta,
   DB_USER: texto,
-  DB_PASSWORD: z.string().min(1),
+  DB_PASSWORD: z.string(),
   DB_NAME: texto,
 });
 
@@ -40,7 +45,3 @@ export function carregarConfig(): Config {
     },
   };
 }
-import { config } from 'dotenv';
-import { z } from 'zod';
-
-config({ quiet: true });
