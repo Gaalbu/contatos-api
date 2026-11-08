@@ -23,10 +23,15 @@ describe('comando de migração', () => {
   });
 
   it('informa o código da falha sem imprimir a senha', () => {
-    configBancoTeste();
+    const banco = configBancoTeste();
     const senha = 'senha-invalida-nao-expor';
     const resultado = spawnSync(process.execPath, ['--import', 'tsx', migracao], {
-      env: { ...process.env, DB_USER: 'usuario_inexistente', DB_PASSWORD: senha },
+      env: {
+        ...process.env,
+        DB_NAME: banco.nome,
+        DB_USER: 'usuario_inexistente',
+        DB_PASSWORD: senha,
+      },
       encoding: 'utf8',
       timeout: 10000,
     });
