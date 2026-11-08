@@ -6,6 +6,7 @@ import {
   parametrosContatoSchema,
 } from '../../src/contatos/contato.schema.js';
 import {
+  dddsExistentes,
   nomesInvalidos,
   nomesValidos,
   telefonesInvalidos,
@@ -14,6 +15,7 @@ import {
 
 const TELEFONE = '91988887777';
 const NOME = 'Ana Souza';
+const TODOS_OS_DDDS = Array.from({ length: 99 }, (_, indice) => indice + 1);
 
 describe('novoContatoSchema', () => {
   it.each(nomesValidos)('aceita o nome %j e o normaliza', (entrada, esperado) => {
@@ -30,6 +32,16 @@ describe('novoContatoSchema', () => {
 
   it.each(telefonesInvalidos)('rejeita o telefone %j', (telefone) => {
     expect(novoContatoSchema.safeParse({ nome: NOME, telefone }).success).toBe(false);
+  });
+
+  it.each(TODOS_OS_DDDS)('aceita o DDD %i somente se ele existir', (numero) => {
+    const ddd = String(numero).padStart(2, '0');
+    const telefones = [`${ddd}988887777`, `${ddd}33334444`];
+    const aceitos = telefones.filter(
+      (telefone) => novoContatoSchema.safeParse({ nome: NOME, telefone }).success,
+    );
+
+    expect(aceitos).toEqual(dddsExistentes.includes(numero) ? telefones : []);
   });
 
   it('exige o nome e o telefone', () => {

@@ -79,7 +79,7 @@ Erros de validação devolvem 400 neste formato:
 ## Regras de validação
 
 - **Nome:** ao menos duas palavras, cada uma com ao menos 3 letras. Aceita acentos, hífen e apóstrofo entre letras. Máximo de 120 caracteres.
-- **Telefone:** brasileiro, com DDD, com ou sem máscara e `+55`. Celular com 9 na frente ou fixo iniciado de 2 a 5.
+- **Telefone:** brasileiro, com DDD existente, com ou sem máscara e `+55`. Celular com 9 na frente ou fixo iniciado de 2 a 5.
 
 ## Decisões sobre o enunciado
 
