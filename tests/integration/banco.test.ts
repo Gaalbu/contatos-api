@@ -33,6 +33,15 @@ describe('banco de testes', () => {
     expect(linhas[0]?.data).toEqual(new Date('2026-11-08T12:00:00Z'));
   });
 
+  it('serializa aplicações simultâneas das migrações', async () => {
+    await pool.query('DROP TABLE IF EXISTS contatos, migracoes');
+
+    await Promise.all(Array.from({ length: 4 }, () => aplicarMigracoes(pool)));
+
+    const [aplicadas] = await pool.execute<RowDataPacket[]>('SELECT nome FROM migracoes');
+    expect(aplicadas).toEqual([{ nome: '001_criar_contatos.sql' }]);
+  });
+
   it('reaplica as migrações sem duplicar registros nem perder dados', async () => {
     const [insercao] = await pool.execute<ResultSetHeader>(
       'INSERT INTO contatos (nome, telefone) VALUES (?, ?)',
