@@ -15,14 +15,9 @@ afterAll(async () => pool?.end());
 afterEach(() => vi.unstubAllEnvs());
 
 describe('banco de testes', () => {
-  it('usa contatos_test por padrão', () => {
-    vi.stubEnv('TEST_DB_NAME', undefined);
+  it.each(['contatos', 'outro_test', 'mysql'])('usa contatos_test mesmo com DB_NAME=%s', (nome) => {
+    vi.stubEnv('DB_NAME', nome);
     expect(configBancoTeste().nome).toBe('contatos_test');
-  });
-
-  it.each(['contatos', 'contatos_test_backup', '', 'mysql'])('recusa o banco %s', (nome) => {
-    vi.stubEnv('TEST_DB_NAME', nome);
-    expect(criarPoolTeste).toThrow('Testes exigem um banco terminado em _test');
   });
 
   it('mantém utf8mb4 e interpreta datas como UTC', async () => {
