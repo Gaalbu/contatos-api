@@ -8,6 +8,7 @@ const ID_MAXIMO = 4_294_967_295;
 const FORMATO_PALAVRA = /^\p{L}+(?:['’-]\p{L}+)*$/u;
 const LETRA = /\p{L}/gu;
 const SEPARADORES_TELEFONE = /[\s().-]/g;
+const PREFIXO_MAIS = /^\+/;
 const TELEFONE_COM_DDI = /^55\d{10,11}$/;
 const FORMATO_TELEFONE = /^[1-9]{2}(?:9\d{8}|[2-5]\d{7})$/;
 const FORMATO_ID = /^[1-9]\d{0,9}$/;
@@ -19,9 +20,8 @@ const separarPalavras = (nome: string) => nome.split(' ');
 const contarLetras = (palavra: string) => palavra.match(LETRA)?.length ?? 0;
 
 const normalizarTelefone = (telefone: string) => {
-  const semSeparadores = telefone.replace(SEPARADORES_TELEFONE, '');
-  const semMais = semSeparadores.startsWith('+') ? semSeparadores.slice(1) : semSeparadores;
-  return TELEFONE_COM_DDI.test(semMais) ? semMais.slice(2) : semMais;
+  const digitos = telefone.replace(SEPARADORES_TELEFONE, '').replace(PREFIXO_MAIS, '');
+  return TELEFONE_COM_DDI.test(digitos) ? digitos.slice(2) : digitos;
 };
 
 const mensagemDeTexto = (campo: string) => (entrada: { input: unknown }) =>
@@ -55,16 +55,12 @@ const telefoneSchema = z
     error: 'Informe um telefone brasileiro válido, com DDD',
   });
 
-const camposDoContato = { nome: nomeSchema, telefone: telefoneSchema };
+export const novoContatoSchema = z.strictObject(
+  { nome: nomeSchema, telefone: telefoneSchema },
+  { error: 'O corpo deve ser um objeto JSON' },
+);
 
-const MENSAGEM_CORPO_INVALIDO = 'O corpo deve ser um objeto JSON';
-
-export const novoContatoSchema = z.strictObject(camposDoContato, {
-  error: MENSAGEM_CORPO_INVALIDO,
-});
-
-export const alteracaoContatoSchema = z
-  .strictObject(camposDoContato, { error: MENSAGEM_CORPO_INVALIDO })
+export const alteracaoContatoSchema = novoContatoSchema
   .partial()
   .refine((campos) => Object.keys(campos).length > 0, {
     error: 'Informe ao menos um campo para atualizar',
