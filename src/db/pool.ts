@@ -2,6 +2,11 @@ import { createPool, type Pool } from 'mysql2/promise';
 
 import type { ConfigBanco } from '../config/env.js';
 
+export const codigoDoErro = (erro: unknown): string =>
+  erro instanceof Error && 'code' in erro && typeof erro.code === 'string'
+    ? erro.code
+    : 'ERRO_DESCONHECIDO';
+
 export const criarPool = (banco: ConfigBanco): Pool => {
   return createPool({
     host: banco.host,

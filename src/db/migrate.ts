@@ -4,7 +4,7 @@ import { pathToFileURL } from 'node:url';
 import type { Pool, PoolConnection, RowDataPacket } from 'mysql2/promise';
 
 import { carregarConfig } from '../config/env.js';
-import { criarPool } from './pool.js';
+import { codigoDoErro, criarPool } from './pool.js';
 
 const NOME_DO_BLOQUEIO = 'contatos_migracoes';
 const ESPERA_DO_BLOQUEIO_EM_SEGUNDOS = 60;
@@ -59,11 +59,7 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
   try {
     await aplicarMigracoes(pool);
   } catch (erro) {
-    const codigo =
-      erro instanceof Error && 'code' in erro && typeof erro.code === 'string'
-        ? erro.code
-        : 'ERRO_DESCONHECIDO';
-    console.error(`Não foi possível aplicar as migrações (${codigo})`);
+    console.error(`Não foi possível aplicar as migrações (${codigoDoErro(erro)})`);
     process.exitCode = 1;
   } finally {
     await pool.end();

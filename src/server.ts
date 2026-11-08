@@ -2,9 +2,9 @@ import type { Express } from 'express';
 import type { Server } from 'node:http';
 
 import { criarApp } from './app.js';
-import { carregarConfig } from './config/env.js';
+import { carregarConfig, ConfiguracaoInvalidaError } from './config/env.js';
 import { criarContatoRepository } from './contatos/contato.repository.js';
-import { criarPool } from './db/pool.js';
+import { codigoDoErro, criarPool } from './db/pool.js';
 
 const escutar = (app: Express, porta: number) =>
   new Promise<Server>((resolve, reject) => {
@@ -38,7 +38,10 @@ const iniciar = async () => {
   }
 };
 
+const descreverFalha = (erro: unknown) =>
+  erro instanceof ConfiguracaoInvalidaError ? erro.message : codigoDoErro(erro);
+
 iniciar().catch((erro: unknown) => {
-  console.error('Falha ao iniciar a API:', erro instanceof Error ? erro.message : erro);
+  console.error(`Falha ao iniciar a API: ${descreverFalha(erro)}`);
   process.exitCode = 1;
 });

@@ -27,11 +27,13 @@ const esquema = z.object({
   DB_NAME: texto,
 });
 
+export class ConfiguracaoInvalidaError extends Error {}
+
 export const carregarConfig = (): Config => {
   const resultado = esquema.safeParse(process.env);
   if (!resultado.success) {
     const variaveis = [...new Set(resultado.error.issues.map((erro) => erro.path.join('.')))];
-    throw new Error(`Configuração inválida: ${variaveis.join(', ')}`);
+    throw new ConfiguracaoInvalidaError(`Configuração inválida: ${variaveis.join(', ')}`);
   }
   const ambiente = resultado.data;
   return {
