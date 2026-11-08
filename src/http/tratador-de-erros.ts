@@ -5,14 +5,14 @@ import { ContatoNaoEncontradoError } from '../contatos/contato.service.js';
 
 const CAMPO_DO_CORPO = 'corpo';
 
-const MENSAGENS_DE_REQUISICAO = new Map<number, string>([
-  [413, 'Corpo da requisição acima do limite permitido'],
-  [415, 'Formato do corpo não suportado'],
+const MENSAGENS_POR_TIPO_DE_ERRO = new Map([
+  ['entity.parse.failed', 'JSON malformado'],
+  ['entity.too.large', 'Corpo da requisição acima do limite permitido'],
 ]);
 
-type ErroDeRequisicao = { status: number; type?: string };
+type ErroDeCliente = { status: number; type?: string };
 
-const eErroDeRequisicao = (erro: unknown): erro is ErroDeRequisicao => {
+const ehErroDeCliente = (erro: unknown): erro is ErroDeCliente => {
   if (typeof erro !== 'object' || erro === null || !('status' in erro)) {
     return false;
   }
@@ -32,10 +32,8 @@ const listarErrosDeValidacao = (erro: ZodError) =>
     return [{ campo: problema.path.join('.') || CAMPO_DO_CORPO, mensagem: problema.message }];
   });
 
-const mensagemDeRequisicao = (erro: ErroDeRequisicao) =>
-  erro.type === 'entity.parse.failed'
-    ? 'JSON malformado'
-    : (MENSAGENS_DE_REQUISICAO.get(erro.status) ?? 'Requisição inválida');
+const mensagemParaCliente = (erro: ErroDeCliente) =>
+  MENSAGENS_POR_TIPO_DE_ERRO.get(erro.type ?? '') ?? 'Requisição inválida';
 
 export const rotaNaoEncontrada: RequestHandler = (_req, res) => {
   res.status(404).json({ mensagem: 'Rota não encontrada' });
@@ -54,8 +52,8 @@ export const tratarErros: ErrorRequestHandler = (erro: unknown, _req, res, next)
     res.status(404).json({ mensagem: erro.message });
     return;
   }
-  if (eErroDeRequisicao(erro)) {
-    res.status(erro.status).json({ mensagem: mensagemDeRequisicao(erro) });
+  if (ehErroDeCliente(erro)) {
+    res.status(erro.status).json({ mensagem: mensagemParaCliente(erro) });
     return;
   }
   console.error('Erro inesperado', descreverErroInesperado(erro));

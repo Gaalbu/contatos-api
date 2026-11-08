@@ -133,7 +133,9 @@ describe('API de contatos', () => {
         .send({ nome: 'a'.repeat(102_401), telefone: TELEFONE });
 
       expect(resposta.status).toBe(413);
-      expect(resposta.body.mensagem).toBeTypeOf('string');
+      expect(resposta.body).toEqual({
+        mensagem: 'Corpo da requisição acima do limite permitido',
+      });
     });
   });
 
