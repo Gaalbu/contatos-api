@@ -8,8 +8,7 @@ const ID_MAXIMO = 4_294_967_295;
 const FORMATO_PALAVRA = /^\p{L}+(?:['’-]\p{L}+)*$/u;
 const LETRA = /\p{L}/gu;
 const SEPARADORES_TELEFONE = /[\s().-]/g;
-const PREFIXO_MAIS = /^\+/;
-const TELEFONE_COM_DDI = /^55\d{10,11}$/;
+const DDI_BRASIL = /^\+?55(?=\d{10,11}$)/;
 const FORMATO_TELEFONE =
   /^(?:1[1-9]|2[12478]|3[1-578]|4[1-9]|5[1345]|6[1-9]|7[134579]|8[1-9]|9[1-9])(?:9\d{8}|[2-5]\d{7})$/;
 const FORMATO_ID = /^[1-9]\d{0,9}$/;
@@ -20,10 +19,8 @@ const separarPalavras = (nome: string) => nome.split(' ');
 
 const contarLetras = (palavra: string) => palavra.match(LETRA)?.length ?? 0;
 
-const normalizarTelefone = (telefone: string) => {
-  const digitos = telefone.replace(SEPARADORES_TELEFONE, '').replace(PREFIXO_MAIS, '');
-  return TELEFONE_COM_DDI.test(digitos) ? digitos.slice(2) : digitos;
-};
+const normalizarTelefone = (telefone: string) =>
+  telefone.replace(SEPARADORES_TELEFONE, '').replace(DDI_BRASIL, '');
 
 const mensagemDeTexto = (campo: string) => (entrada: { input: unknown }) =>
   entrada.input === undefined ? `Informe o ${campo}` : `O ${campo} deve ser um texto`;
