@@ -29,8 +29,12 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
   const pool = criarPool(carregarConfig().banco);
   try {
     await aplicarMigracoes(pool);
-  } catch {
-    console.error('Não foi possível aplicar as migrações');
+  } catch (erro) {
+    const codigo =
+      erro instanceof Error && 'code' in erro && typeof erro.code === 'string'
+        ? erro.code
+        : 'ERRO_DESCONHECIDO';
+    console.error(`Não foi possível aplicar as migrações (${codigo})`);
     process.exitCode = 1;
   } finally {
     await pool.end();
