@@ -1,0 +1,49 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  verificar:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    services:
+      mysql:
+        image: mysql:8.4
+        env:
+          MYSQL_ROOT_PASSWORD: root_test
+          MYSQL_DATABASE: contatos_test
+          MYSQL_USER: contatos
+          MYSQL_PASSWORD: contatos_test
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping -h 127.0.0.1 -u root -proot_test --silent"
+          --health-interval=2s
+          --health-timeout=3s
+          --health-retries=30
+    env:
+      PORT: '3000'
+      DB_HOST: 127.0.0.1
+      DB_PORT: '3306'
+      DB_USER: contatos
+      DB_PASSWORD: contatos_test
+      DB_NAME: contatos_test
+      TEST_DB_NAME: contatos_test
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+      - uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - run: npm run db:migrate
+      - run: npm run gate
+      - run: npm run test:coverage
+      - run: npm test
+        env:
+          TEST_REPOSITORIO: mysql
