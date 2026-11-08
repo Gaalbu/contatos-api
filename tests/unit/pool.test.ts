@@ -1,6 +1,23 @@
 import { describe, expect, it } from 'vitest';
 
-import { codigoDoErro } from '../../src/db/pool.js';
+import { ConfiguracaoInvalidaError } from '../../src/config/env.js';
+import { codigoDoErro, descreverFalha } from '../../src/db/pool.js';
+
+describe('descreverFalha', () => {
+  it('mantém a mensagem da configuração inválida, que só traz nomes de variáveis', () => {
+    const erro = new ConfiguracaoInvalidaError('Configuração inválida: DB_PORT');
+
+    expect(descreverFalha(erro)).toBe('Configuração inválida: DB_PORT');
+  });
+
+  it('reduz as demais falhas ao código', () => {
+    const erro = Object.assign(new Error("Access denied for user 'contatos'"), {
+      code: 'ER_ACCESS_DENIED_ERROR',
+    });
+
+    expect(descreverFalha(erro)).toBe('ER_ACCESS_DENIED_ERROR');
+  });
+});
 
 describe('codigoDoErro', () => {
   it('devolve o código do erro sem usar a mensagem', () => {

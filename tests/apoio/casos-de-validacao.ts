@@ -7,7 +7,7 @@ export const nomesValidos = [
   ['Ana Luz Silva', 'Ana Luz Silva'],
   ['Maria-Clara Souza', 'Maria-Clara Souza'],
   ["Sant'Ana Souza", "Sant'Ana Souza"],
-  ['José Araújo', 'José Araújo'],
+  ['José Araújo'.normalize('NFD'), 'José Araújo'],
   [`${'a'.repeat(59)} ${'b'.repeat(60)}`, `${'a'.repeat(59)} ${'b'.repeat(60)}`],
   [nomeNoLimiteForaDoPlanoBasico, nomeNoLimiteForaDoPlanoBasico],
 ] as const;

@@ -5,7 +5,7 @@ import { describe, expect, it } from 'vitest';
 
 import { configBancoTeste } from './apoio/banco.js';
 
-const migracao = fileURLToPath(new URL('../../src/db/migrate.ts', import.meta.url));
+const migracao = fileURLToPath(new URL('../../src/db/migrate.cli.ts', import.meta.url));
 
 describe('comando de migração', () => {
   it('aplica e reaplica pelo comando sem erro', () => {
@@ -39,5 +39,17 @@ describe('comando de migração', () => {
     expect(resultado.stderr).toContain('ER_ACCESS_DENIED_ERROR');
     expect(resultado.stderr).not.toContain(senha);
     expect(resultado.stderr).not.toContain('SELECT');
+  });
+
+  it('diz qual variável está inválida em uma linha, sem imprimir o valor', () => {
+    const resultado = spawnSync(process.execPath, ['--import', 'tsx', migracao], {
+      env: { ...process.env, DB_PORT: 'valor-nao-expor' },
+      encoding: 'utf8',
+      timeout: 10000,
+    });
+    expect(resultado.status).toBe(1);
+    expect(resultado.stderr.trim()).toBe(
+      'Não foi possível aplicar as migrações: Configuração inválida: DB_PORT',
+    );
   });
 });

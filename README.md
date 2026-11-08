@@ -51,12 +51,13 @@ A API fica em `http://localhost:3000`. Para rodar a versão compilada:
 
 ## Testes
 
-| Comando                    | O que verifica                         | Precisa de MySQL |
-| -------------------------- | -------------------------------------- | ---------------- |
-| `npm run test:unit`        | Validação e rotas com banco em memória | Não              |
-| `npm run test:integration` | Repositório e migrações no MySQL       | Sim              |
-| `npm run test:coverage`    | Todos os testes, com cobertura         | Sim              |
-| `npm run gate`             | Tipos, lint, formatação, testes, build | Sim              |
+| Comando                           | O que verifica                         | Precisa de MySQL |
+| --------------------------------- | -------------------------------------- | ---------------- |
+| `npm run test:unit`               | Validação e rotas com banco em memória | Não              |
+| `npm run test:integration`        | Repositório e migrações no MySQL       | Sim              |
+| `npm run test:coverage`           | Todos os testes, com cobertura         | Sim              |
+| `TEST_REPOSITORIO=mysql npm test` | Todos os testes, com as rotas no MySQL | Sim              |
+| `npm run gate`                    | Tipos, lint, formatação, testes, build | Sim              |
 
 ## Rotas
 
