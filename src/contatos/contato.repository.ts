@@ -20,22 +20,10 @@ export function criarContatoRepository(pool: Pool): ContatoRepository {
       return contatos;
     },
     async atualizar(id, dados) {
-      const campos: string[] = [];
-      const valores: (string | number)[] = [];
-      if (dados.nome !== undefined) {
-        campos.push('nome = ?');
-        valores.push(dados.nome);
-      }
-      if (dados.telefone !== undefined) {
-        campos.push('telefone = ?');
-        valores.push(dados.telefone);
-      }
-      if (campos.length > 0) {
-        await pool.execute(`UPDATE contatos SET ${campos.join(', ')} WHERE id = ?`, [
-          ...valores,
-          id,
-        ]);
-      }
+      await pool.execute(
+        'UPDATE contatos SET nome = COALESCE(?, nome), telefone = COALESCE(?, telefone) WHERE id = ?',
+        [dados.nome ?? null, dados.telefone ?? null, id],
+      );
       const [contatos] = await pool.execute<LinhaContato[]>(
         'SELECT id, nome, telefone FROM contatos WHERE id = ?',
         [id],
