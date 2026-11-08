@@ -27,7 +27,7 @@ const esquema = z.object({
   DB_NAME: texto,
 });
 
-export function carregarConfig(): Config {
+export const carregarConfig = (): Config => {
   const resultado = esquema.safeParse(process.env);
   if (!resultado.success) {
     const variaveis = [...new Set(resultado.error.issues.map((erro) => erro.path.join('.')))];
@@ -44,4 +44,4 @@ export function carregarConfig(): Config {
       nome: ambiente.DB_NAME,
     },
   };
-}
+};

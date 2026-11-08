@@ -1,7 +1,7 @@
 import { carregarConfig, type ConfigBanco } from '../../../src/config/env.js';
 import { criarPool } from '../../../src/db/pool.js';
 
-export function configBancoTeste(): ConfigBanco {
+export const configBancoTeste = (): ConfigBanco => {
   const banco = {
     ...carregarConfig().banco,
     nome: process.env.TEST_DB_NAME ?? 'contatos_test',
@@ -10,8 +10,8 @@ export function configBancoTeste(): ConfigBanco {
     throw new Error('Testes exigem um banco terminado em _test');
   }
   return banco;
-}
+};
 
-export function criarPoolTeste() {
+export const criarPoolTeste = () => {
   return criarPool(configBancoTeste());
-}
+};

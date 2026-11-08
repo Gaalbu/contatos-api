@@ -2,7 +2,7 @@ import { createPool, type Pool } from 'mysql2/promise';
 
 import type { ConfigBanco } from '../config/env.js';
 
-export function criarPool(banco: ConfigBanco): Pool {
+export const criarPool = (banco: ConfigBanco): Pool => {
   return createPool({
     host: banco.host,
     port: banco.porta,
@@ -15,4 +15,4 @@ export function criarPool(banco: ConfigBanco): Pool {
     waitForConnections: true,
     connectTimeout: 10000,
   });
-}
+};

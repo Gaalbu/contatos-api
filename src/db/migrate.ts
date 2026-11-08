@@ -6,7 +6,7 @@ import type { Pool, RowDataPacket } from 'mysql2/promise';
 import { carregarConfig } from '../config/env.js';
 import { criarPool } from './pool.js';
 
-export async function aplicarMigracoes(pool: Pool): Promise<void> {
+export const aplicarMigracoes = async (pool: Pool): Promise<void> => {
   await pool.execute(`CREATE TABLE IF NOT EXISTS migracoes (
     nome VARCHAR(255) NOT NULL PRIMARY KEY,
     aplicada_em DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3)
@@ -23,7 +23,7 @@ export async function aplicarMigracoes(pool: Pool): Promise<void> {
     await pool.query(sql);
     await pool.execute('INSERT INTO migracoes (nome) VALUES (?)', [nome]);
   }
-}
+};
 
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   const pool = criarPool(carregarConfig().banco);

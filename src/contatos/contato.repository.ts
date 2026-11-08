@@ -4,7 +4,7 @@ import type { Contato, ContatoRepository } from './contato.types.js';
 
 type LinhaContato = Contato & RowDataPacket;
 
-export function criarContatoRepository(pool: Pool): ContatoRepository {
+export const criarContatoRepository = (pool: Pool): ContatoRepository => {
   return {
     async criar(dados) {
       const [resultado] = await pool.execute<ResultSetHeader>(
@@ -37,4 +37,4 @@ export function criarContatoRepository(pool: Pool): ContatoRepository {
       return resultado.affectedRows > 0;
     },
   };
-}
+};
