@@ -103,10 +103,13 @@ describe('API de contatos', () => {
     });
   });
 
-  describe('corpo da requisição', () => {
+  describe.each(['post', 'patch'] as const)('corpo da requisição no %s', (metodo) => {
+    const prepararRota = async () =>
+      metodo === 'post' ? '/contatos' : `/contatos/${(await criarContato()).id}`;
+    const abrirRequisicao = (rota: string) => request(app)[metodo](rota);
+
     it.each(['[]', '[1, 2]'])('rejeita o corpo %s, que não é objeto', async (corpo) => {
-      const resposta = await request(app)
-        .post('/contatos')
+      const resposta = await abrirRequisicao(await prepararRota())
         .set('Content-Type', 'application/json')
         .send(corpo);
 
@@ -115,8 +118,7 @@ describe('API de contatos', () => {
     });
 
     it.each(['"texto"', '10', '{"nome":'])('rejeita o JSON %s', async (corpo) => {
-      const resposta = await request(app)
-        .post('/contatos')
+      const resposta = await abrirRequisicao(await prepararRota())
         .set('Content-Type', 'application/json')
         .send(corpo);
 
@@ -125,15 +127,14 @@ describe('API de contatos', () => {
     });
 
     it('rejeita requisição sem corpo', async () => {
-      const resposta = await request(app).post('/contatos');
+      const resposta = await abrirRequisicao(await prepararRota());
 
       expect(resposta.status).toBe(400);
       expect(resposta.body.erros[0].campo).toBe('corpo');
     });
 
     it('rejeita corpo que não seja application/json', async () => {
-      const resposta = await request(app)
-        .post('/contatos')
+      const resposta = await abrirRequisicao(await prepararRota())
         .set('Content-Type', 'text/plain')
         .send(JSON.stringify(CONTATO));
 
@@ -142,9 +143,10 @@ describe('API de contatos', () => {
     });
 
     it('rejeita corpo acima de 100 KB', async () => {
-      const resposta = await request(app)
-        .post('/contatos')
-        .send({ nome: 'a'.repeat(102_401), telefone: TELEFONE });
+      const resposta = await abrirRequisicao(await prepararRota()).send({
+        nome: 'a'.repeat(102_401),
+        telefone: TELEFONE,
+      });
 
       expect(resposta.status).toBe(413);
       expect(resposta.body).toEqual({
@@ -242,12 +244,6 @@ describe('API de contatos', () => {
       const { id } = await criarContato();
 
       await request(app).patch(`/contatos/${id}`).send({}).expect(400);
-    });
-
-    it('rejeita requisição sem corpo', async () => {
-      const { id } = await criarContato();
-
-      await request(app).patch(`/contatos/${id}`).expect(400);
     });
 
     it('rejeita campo desconhecido mesmo com campo válido', async () => {
