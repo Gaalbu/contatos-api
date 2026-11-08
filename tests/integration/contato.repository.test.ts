@@ -85,6 +85,28 @@ describe('ContatoRepository com MySQL', () => {
     expect(await contatos.atualizar(contato.id, { nome: dados.nome })).toEqual(contato);
   });
 
+  it('devolve a própria alteração em atualizações simultâneas', async () => {
+    const contato = await contatos.criar(dados);
+    const nomes = Array.from({ length: 20 }, (_, indice) => `Contato Numero${indice}`);
+
+    const atualizados = await Promise.all(
+      nomes.map((nome) => contatos.atualizar(contato.id, { nome })),
+    );
+
+    expect(atualizados.map((atualizado) => atualizado?.nome)).toEqual(nomes);
+  });
+
+  it('mantém o contato e libera as conexões quando o banco recusa a alteração', async () => {
+    const contato = await contatos.criar(dados);
+
+    const resultados = await Promise.allSettled(
+      Array.from({ length: 15 }, () => contatos.atualizar(contato.id, { telefone: '123' })),
+    );
+
+    expect(resultados.every((resultado) => resultado.status === 'rejected')).toBe(true);
+    expect(await contatos.listar()).toEqual([contato]);
+  });
+
   it('devolve null ao atualizar id inexistente', async () => {
     expect(await contatos.atualizar(4294967295, { nome: 'José Araújo' })).toBeNull();
   });
