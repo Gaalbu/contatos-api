@@ -19,8 +19,8 @@ describe('API de contatos', () => {
     return resposta.body as { id: number };
   };
 
-  beforeAll(() => {
-    banco = criarRepositorioDeTeste();
+  beforeAll(async () => {
+    banco = await criarRepositorioDeTeste();
     app = criarApp(banco.repositorio);
   });
 
