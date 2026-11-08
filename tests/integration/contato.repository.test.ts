@@ -46,6 +46,16 @@ describe('ContatoRepository com MySQL', () => {
     expect(segundo.id).toBeGreaterThan(primeiro.id);
   });
 
+  it('aguarda conexões disponíveis em um pico de cem criações simultâneas', async () => {
+    const resultados = await Promise.allSettled(
+      Array.from({ length: 100 }, () => contatos.criar(dados)),
+    );
+    expect(resultados.filter((resultado) => resultado.status === 'rejected')).toEqual([]);
+    const criados = await contatos.listar();
+    expect(criados).toHaveLength(100);
+    expect(new Set(criados.map((contato) => contato.id)).size).toBe(100);
+  });
+
   it('altera o nome sem mudar o telefone', async () => {
     const contato = await contatos.criar(dados);
     expect(await contatos.atualizar(contato.id, { nome: 'José Araújo' })).toEqual({

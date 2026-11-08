@@ -13,7 +13,6 @@ export function criarPool(banco: ConfigBanco): Pool {
     timezone: 'Z',
     connectionLimit: 10,
     waitForConnections: true,
-    queueLimit: 20,
     connectTimeout: 10000,
   });
 }
