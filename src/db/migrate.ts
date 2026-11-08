@@ -1,10 +1,6 @@
 import { readdir, readFile } from 'node:fs/promises';
-import { pathToFileURL } from 'node:url';
 
 import type { Pool, PoolConnection, RowDataPacket } from 'mysql2/promise';
-
-import { carregarConfig } from '../config/env.js';
-import { codigoDoErro, criarPool } from './pool.js';
 
 const NOME_DO_BLOQUEIO = 'contatos_migracoes';
 const ESPERA_DO_BLOQUEIO_EM_SEGUNDOS = 60;
@@ -53,15 +49,3 @@ export const aplicarMigracoes = async (pool: Pool): Promise<void> => {
     conexao.release();
   }
 };
-
-if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
-  const pool = criarPool(carregarConfig().banco);
-  try {
-    await aplicarMigracoes(pool);
-  } catch (erro) {
-    console.error(`Não foi possível aplicar as migrações (${codigoDoErro(erro)})`);
-    process.exitCode = 1;
-  } finally {
-    await pool.end();
-  }
-}
