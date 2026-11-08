@@ -1,7 +1,7 @@
-import { carregarConfig } from '../../../src/config/env.js';
 import { criarContatoRepository } from '../../../src/contatos/contato.repository.js';
 import type { Contato, ContatoRepository } from '../../../src/contatos/contato.types.js';
-import { criarPool } from '../../../src/db/pool.js';
+import { aplicarMigracoes } from '../../../src/db/migrate.js';
+import { criarPoolTeste } from '../../integration/apoio/banco.js';
 
 export type RepositorioDeTeste = {
   repositorio: ContatoRepository;
@@ -43,9 +43,9 @@ const criarRepositorioEmMemoria = (): RepositorioDeTeste => {
   };
 };
 
-const criarRepositorioMySql = (): RepositorioDeTeste => {
-  process.env.DB_NAME = 'contatos_test';
-  const pool = criarPool(carregarConfig().banco);
+const criarRepositorioMySql = async (): Promise<RepositorioDeTeste> => {
+  const pool = criarPoolTeste();
+  await aplicarMigracoes(pool);
 
   return {
     repositorio: criarContatoRepository(pool),
@@ -56,5 +56,5 @@ const criarRepositorioMySql = (): RepositorioDeTeste => {
   };
 };
 
-export const criarRepositorioDeTeste = (): RepositorioDeTeste =>
+export const criarRepositorioDeTeste = async (): Promise<RepositorioDeTeste> =>
   process.env.TEST_REPOSITORIO === 'mysql' ? criarRepositorioMySql() : criarRepositorioEmMemoria();
